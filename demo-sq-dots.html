@@ -279,7 +279,13 @@ function update(page) {
     specEl.innerHTML = `<span class="white">Sizes:</span> 8px → 8px → 6px → 4px → hidden<br>` +
       `<span class="white">Dist:</span> 0 (active) · 1 (neighbour) · 2 · 3 · 4+<br>` +
       `<span class="white">Max visible:</span> ${MAX_VISIBLE} · <span class="white">Gap:</span> 5px · <span class="white">Active:</span> 100% · <span class="white">Inactive:</span> 70% opacity<br>` +
-      specLines.join(' · ');
+      specLines.join(' · ') +
+      `<br><br><span class="white">— Transition & Animation —</span><br>` +
+      `<span class="white">Dots:</span> all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1) · will-change: width, height<br>` +
+      `<span class="white">Slide:</span> transform 0.45s cubic-bezier(0.25, 0.1, 0.25, 1) · will-change: transform<br>` +
+      `<span class="white">Drag:</span> transition: none (during drag) · snap threshold: 18% of slide width<br>` +
+      `<span class="white">Arrows:</span> opacity 0.25s · scale 0.92 on press<br>` +
+      `<span class="white">Easing:</span> cubic-bezier(0.25, 0.1, 0.25, 1) — CSS ease equivalent`;
   }
 }
 
