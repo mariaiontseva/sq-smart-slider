@@ -395,11 +395,11 @@ function buildStateTable(n) {
       const dist = Math.abs(i - active);
       const sz = getSize(dist, n);
       if (i === active) {
-        html += `<td class="active-cell">${sz}●</td>`;
+        html += `<td><span style="display:inline-block;width:${sz}px;height:${sz}px;border-radius:50%;background:#4075BF;vertical-align:middle"></span></td>`;
       } else if (sz === 0) {
         html += `<td class="hidden-cell">·</td>`;
       } else {
-        html += `<td>${sz}</td>`;
+        html += `<td><span style="display:inline-block;width:${sz}px;height:${sz}px;border-radius:50%;background:rgba(255,255,255,0.7);vertical-align:middle"></span></td>`;
       }
     }
     html += `</tr>`;
