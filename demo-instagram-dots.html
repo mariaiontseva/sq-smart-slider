@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instagram/iOS Dots — Reference</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #1c1c1e;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    color: #fff;
+    gap: 24px;
+    padding: 20px;
+  }
+
+  h2 { font-size: 15px; font-weight: 600; color: #8e8e93; letter-spacing: 0.5px; }
+
+  .selector-bar {
+    display: flex; align-items: center; gap: 8px;
+    background: #2c2c2e; padding: 8px 16px; border-radius: 16px;
+  }
+  .selector-label { font-size: 13px; font-weight: 600; color: #8e8e93; margin-right: 4px; }
+  .selector-btn {
+    width: 40px; height: 36px; border-radius: 10px; border: none;
+    background: #3a3a3c; color: #fff; font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s; font-family: inherit;
+  }
+  .selector-btn:hover { background: #48484a; }
+  .selector-btn.active { background: #007AFF; }
+
+  .demo-box {
+    background: #2c2c2e; border-radius: 20px; padding: 32px 40px;
+    display: flex; flex-direction: column; align-items: center; gap: 20px;
+    min-width: 400px;
+  }
+
+  .dots-row {
+    display: flex; align-items: center; gap: 6px; height: 12px;
+  }
+
+  .dot {
+    border-radius: 50%;
+    transition: all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+    will-change: width, height;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+
+  .counter { font-size: 14px; color: #8e8e93; font-variant-numeric: tabular-nums; }
+
+  .arrows {
+    display: flex; gap: 12px; align-items: center;
+  }
+  .arrow {
+    width: 40px; height: 40px; border-radius: 50%; border: none;
+    background: #3a3a3c; color: #fff; font-size: 18px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+  }
+  .arrow:hover { background: #48484a; }
+  .arrow:disabled { opacity: 0.3; cursor: default; }
+
+  .spec-table {
+    font-size: 12px; color: #aeaeb2; line-height: 1.8;
+    text-align: center;
+  }
+  .spec-table .blue { color: #007AFF; font-weight: 600; }
+  .spec-table .white { color: #fff; font-weight: 600; }
+
+  .nav-hint { font-size: 11px; color: #636366; }
+  .nav-hint kbd {
+    background: #3a3a3c; border: 1px solid #48484a; border-radius: 4px;
+    padding: 1px 6px; font-family: inherit; font-size: 10px; color: #8e8e93;
+  }
+</style>
+</head>
+<body>
+
+<h2>INSTAGRAM / iOS SCROLLING PAGE CONTROL — REFERENCE</h2>
+
+<div class="selector-bar">
+  <span class="selector-label">Slides:</span>
+  <button class="selector-btn" data-count="3">3</button>
+  <button class="selector-btn" data-count="5">5</button>
+  <button class="selector-btn" data-count="7">7</button>
+  <button class="selector-btn" data-count="8">8</button>
+  <button class="selector-btn" data-count="9">9</button>
+  <button class="selector-btn" data-count="10">10</button>
+  <button class="selector-btn active" data-count="20">20</button>
+  <button class="selector-btn" data-count="50">50</button>
+  <button class="selector-btn" data-count="100">100</button>
+</div>
+
+<div class="demo-box">
+  <div class="dots-row" id="dots"></div>
+  <div class="arrows">
+    <button class="arrow" id="prev">‹</button>
+    <span class="counter" id="counter">1 / 20</span>
+    <button class="arrow" id="next">›</button>
+  </div>
+  <div class="spec-table" id="spec"></div>
+</div>
+
+<div class="nav-hint"><kbd>←</kbd> <kbd>→</kbd> arrows</div>
+
+<script>
+const DOT_SIZE = 6;        // base size in px (matching iOS 6pt)
+const SPACING = 6;         // gap between dots
+const ACTIVE_COLOUR = '#007AFF';
+const DEFAULT_COLOUR = 'rgba(255,255,255,0.5)';
+
+// Exact scale array from ScrollingPageControl source (line 153):
+// [1, 0.66, 0.33, 0.16]
+// centerDots = 3, maxDots = 7
+const CENTER_DOTS = 3;
+const MAX_DOTS = 7;
+const SCALES = [1, 0.66, 0.33, 0.16];
+
+let total = 20;
+let current = 0;
+let dots = [];
+
+const dotsEl = document.getElementById('dots');
+const counterEl = document.getElementById('counter');
+const specEl = document.getElementById('spec');
+const prevBtn = document.getElementById('prev');
+const nextBtn = document.getElementById('next');
+
+function getScale(page, centerPage) {
+  const distance = Math.abs(page - centerPage);
+  const maxHalf = Math.floor(MAX_DOTS / 2);
+  if (distance > maxHalf) return 0;
+  const idx = Math.max(0, Math.min(SCALES.length - 1, distance - Math.floor(CENTER_DOTS / 2)));
+  return SCALES[idx];
+}
+
+function build(count) {
+  total = count;
+  current = 0;
+  dotsEl.innerHTML = '';
+  dots = [];
+  for (let i = 0; i < count; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'dot';
+    dot.addEventListener('click', () => goTo(i));
+    dotsEl.appendChild(dot);
+    dots.push(dot);
+  }
+  goTo(0);
+}
+
+function pageOffset(current, total) {
+  const sidePages = Math.floor((MAX_DOTS - CENTER_DOTS) / 2);
+  const centerHalf = Math.floor(CENTER_DOTS / 2);
+  // Clamp so dots don't scroll past edges
+  return Math.max(0, Math.min(total - MAX_DOTS, current - centerHalf));
+}
+
+function update(page) {
+  const centerDots = Math.min(CENTER_DOTS, total);
+  const maxDots = Math.min(MAX_DOTS, total);
+  const offset = (total <= MAX_DOTS) ? 0 : pageOffset(page, total);
+  const centerPage = Math.floor(centerDots / 2) + offset;
+
+  let specLines = [];
+
+  dots.forEach((dot, i) => {
+    let scale;
+    if (total <= MAX_DOTS) {
+      // All dots visible at full size
+      scale = 1;
+    } else {
+      scale = getScale(i, centerPage);
+    }
+
+    const sz = DOT_SIZE * scale;
+    const isActive = (i === page);
+    dot.style.width = sz + 'px';
+    dot.style.height = sz + 'px';
+    dot.style.backgroundColor = isActive ? ACTIVE_COLOUR : DEFAULT_COLOUR;
+    dot.style.margin = sz === 0 ? '0 -3px' : '0';
+    dot.style.opacity = scale === 0 ? '0' : '1';
+
+    if (scale > 0 && total > MAX_DOTS) {
+      const dist = Math.abs(i - centerPage);
+      const scaleIdx = Math.max(0, Math.min(SCALES.length - 1, dist - Math.floor(CENTER_DOTS / 2)));
+      specLines.push(
+        `${isActive ? '<span class="blue">●</span>' : '○'} #${i+1}: ×${SCALES[scaleIdx]} = ${sz.toFixed(1)}px`
+      );
+    }
+  });
+
+  counterEl.textContent = `${page + 1} / ${total}`;
+  prevBtn.disabled = (page === 0);
+  nextBtn.disabled = (page === total - 1);
+
+  if (total <= MAX_DOTS) {
+    specEl.innerHTML = `<span class="white">Simple mode</span> — all ${total} dots at ${DOT_SIZE}px, no scaling`;
+  } else {
+    specEl.innerHTML = `<span class="white">Scales:</span> ×1 → ×0.66 → ×0.33 → ×0.16 → hidden<br>` +
+      `<span class="white">Base:</span> ${DOT_SIZE}px · <span class="white">Center dots:</span> ${CENTER_DOTS} · <span class="white">Max visible:</span> ${MAX_DOTS}<br>` +
+      specLines.join(' · ');
+  }
+}
+
+function goTo(page) {
+  if (page < 0 || page >= total) return;
+  current = page;
+  update(current);
+}
+
+// Controls
+prevBtn.addEventListener('click', () => goTo(current - 1));
+nextBtn.addEventListener('click', () => goTo(current + 1));
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') goTo(current + 1);
+  if (e.key === 'ArrowLeft') goTo(current - 1);
+});
+
+document.querySelectorAll('.selector-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.selector-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    build(parseInt(btn.dataset.count));
+  });
+});
+
+build(20);
+</script>
+</body>
+</html>
