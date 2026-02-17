@@ -192,10 +192,10 @@
 <script>
 // SQ sizes: 8 → 8 → 6 → 4 → 2 → 0
 // distance:  0    1    2    3    4   5+
-const SIZES = [8, 8, 6, 4, 2];
+const SIZES = [8, 8, 6, 4];
 const ACTIVE_COLOUR = '#007AFF';
 const DEFAULT_COLOUR = 'rgba(255,255,255,0.7)';
-const MAX_VISIBLE = 9; // active + 4 on each side
+const MAX_VISIBLE = 7; // active + 3 on each side
 
 let total = 20;
 let current = 0;
@@ -276,8 +276,8 @@ function update(page) {
   if (total <= 7) {
     specEl.innerHTML = `<span class="white">Simple mode</span> — all ${total} dots at 8px, no scaling`;
   } else {
-    specEl.innerHTML = `<span class="white">Sizes:</span> 8px → 8px → 6px → 4px → 2px → hidden<br>` +
-      `<span class="white">Dist:</span> 0 (active) · 1 (neighbour) · 2 · 3 · 4 · 5+<br>` +
+    specEl.innerHTML = `<span class="white">Sizes:</span> 8px → 8px → 6px → 4px → hidden<br>` +
+      `<span class="white">Dist:</span> 0 (active) · 1 (neighbour) · 2 · 3 · 4+<br>` +
       `<span class="white">Max visible:</span> ${MAX_VISIBLE} · <span class="white">Opacity:</span> always 100%<br>` +
       specLines.join(' · ');
   }
