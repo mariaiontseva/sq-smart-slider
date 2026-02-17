@@ -150,6 +150,31 @@
     background: #3a3a3c; border: 1px solid #48484a; border-radius: 4px;
     padding: 1px 6px; font-family: inherit; font-size: 10px; color: #8e8e93;
   }
+
+  .state-tables {
+    display: flex; gap: 24px; flex-wrap: wrap; justify-content: center;
+  }
+  .state-table-wrap {
+    background: #2c2c2e; border-radius: 20px; padding: 20px 24px;
+  }
+  .state-table-wrap h3 {
+    font-size: 13px; font-weight: 600; color: #8e8e93;
+    text-align: center; margin-bottom: 12px; letter-spacing: 0.3px;
+  }
+  .state-table {
+    border-collapse: collapse; font-size: 11px; font-variant-numeric: tabular-nums;
+  }
+  .state-table th {
+    color: #636366; font-weight: 600; padding: 4px 6px;
+    border-bottom: 1px solid #3a3a3c; text-align: center;
+  }
+  .state-table td {
+    padding: 3px 6px; text-align: center; color: #aeaeb2;
+  }
+  .state-table tr:hover { background: #3a3a3c; }
+  .state-table .active-cell { color: #4075BF; font-weight: 700; }
+  .state-table .hidden-cell { color: #48484a; }
+  .state-table .slide-col { color: #636366; font-weight: 600; text-align: right; padding-right: 10px; }
 </style>
 </head>
 <body>
@@ -186,6 +211,8 @@
 <div class="demo-box">
   <div class="spec-table" id="spec"></div>
 </div>
+
+<div class="state-tables" id="stateTables"></div>
 
 <div class="nav-hint"><kbd>←</kbd> <kbd>→</kbd> arrows or swipe</div>
 
@@ -348,6 +375,43 @@ document.querySelectorAll('.selector-btn').forEach(btn => {
 });
 
 build(20);
+
+// --- State tables for 7 and 8 slides ---
+function buildStateTable(n) {
+  const sizes = [8, 8, 6, 4]; // SIZES array
+  function getSize(dist, total) {
+    if (total <= 7) return 8;
+    if (dist < sizes.length) return sizes[dist];
+    return 0;
+  }
+
+  let html = `<table class="state-table"><tr><th>Slide</th>`;
+  for (let d = 1; d <= n; d++) html += `<th>D${d}</th>`;
+  html += `</tr>`;
+
+  for (let active = 0; active < n; active++) {
+    html += `<tr><td class="slide-col">${active + 1}</td>`;
+    for (let i = 0; i < n; i++) {
+      const dist = Math.abs(i - active);
+      const sz = getSize(dist, n);
+      if (i === active) {
+        html += `<td class="active-cell">${sz}●</td>`;
+      } else if (sz === 0) {
+        html += `<td class="hidden-cell">·</td>`;
+      } else {
+        html += `<td>${sz}</td>`;
+      }
+    }
+    html += `</tr>`;
+  }
+  html += `</table>`;
+  return html;
+}
+
+const tablesEl = document.getElementById('stateTables');
+tablesEl.innerHTML =
+  `<div class="state-table-wrap"><h3>7 SLIDES — SIMPLE MODE</h3>${buildStateTable(7)}</div>` +
+  `<div class="state-table-wrap"><h3>8 SLIDES — SMART MODE</h3>${buildStateTable(8)}</div>`;
 </script>
 </body>
 </html>
