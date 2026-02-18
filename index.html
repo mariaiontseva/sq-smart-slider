@@ -311,7 +311,13 @@ function update(page) {
       `<span class="white">Dots:</span> all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1) · will-change: width, height<br>` +
       `<span class="white">Slide:</span> transform 0.45s cubic-bezier(0.25, 0.1, 0.25, 1) · will-change: transform<br>` +
       `<span class="white">Drag:</span> transition: none (during drag) · snap threshold: 18% of slide width<br>` +
-      `<span class="white">Easing:</span> cubic-bezier(0.25, 0.1, 0.25, 1) — CSS ease equivalent`;
+      `<span class="white">Easing:</span> cubic-bezier(0.25, 0.1, 0.25, 1) — CSS ease equivalent` +
+      `<br><br><span class="white">— Interactions —</span><br>` +
+      `<span class="white">Tap dot:</span> jump to that slide<br>` +
+      `<span class="white">Tap arrow:</span> go ±1 slide · hidden at first/last<br>` +
+      `<span class="white">Swipe (touch):</span> drag to preview → release snaps ±1 if &gt;18% threshold<br>` +
+      `<span class="white">Mouse drag:</span> same as swipe · transition disabled during drag<br>` +
+      `<span class="white">Keyboard ←→:</span> go ±1 slide`;
   }
 }
 
